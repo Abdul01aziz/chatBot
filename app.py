@@ -13,7 +13,7 @@ from datetime import datetime
 from transformers import pipeline
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_community.vectorstores import FAISS
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
 # ---- CONFIG ----
 st.set_page_config(page_title="📚 SmartDoc Chatbot", layout="wide")
@@ -105,19 +105,13 @@ def chat_interface():
 
     if submitted and st.session_state["query"]:
         query = st.session_state["query"]
-
         vectorstore = st.session_state["vectorstore"]
         retriever = vectorstore.as_retriever()
         context_docs = retriever.get_relevant_documents(query)
         context = "\n".join([doc.page_content for doc in context_docs])
-
         bot = st.session_state["bot"]
-        result = bot({
-            "question": query,
-            "context": context
-        })
+        result = bot({"question": query, "context": context})
         answer = result["answer"]
-
         st.session_state["chat_history"].append((query, answer))
 
         user = st.session_state.get("user", "guest")
@@ -163,7 +157,9 @@ if menu == "Upload":
                     full_text += smart_parse(file, save=True) + "\n"
                 st.session_state["vectorstore"] = build_vectorstore(full_text)
                 st.session_state["bot"] = setup_bot()
-            st.success("✅ Files processed. Ready to chat!")
+                menu = "Chat"
+                st.session_state["menu"] = "Chat"
+                st.rerun()
 
     if st.session_state.get("show_manage"):
         st.markdown("### Uploaded Files")
@@ -184,8 +180,6 @@ if menu == "Upload":
                         st.rerun()
 
     st.divider()
-    if st.button("⬅️ Back to Chat"):
-        st.switch_page("/app.py")
     if st.button("🔒 Logout"):
         st.session_state.clear()
         st.rerun()
@@ -195,6 +189,7 @@ elif menu == "Chat":
         st.info("📥 Please upload files first from the Upload tab.")
         st.stop()
     chat_interface()
+
 
 
 
