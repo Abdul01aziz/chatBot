@@ -1,0 +1,14 @@
+streamlit
+pytesseract
+pdf2image
+python-docx
+python-pptx
+pandas
+PyMuPDF
+Pillow
+transformers
+torch
+langchain
+langchain-community
+faiss-cpu
+sentence-transformers
